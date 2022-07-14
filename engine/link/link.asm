@@ -470,7 +470,14 @@ endc
 	ld a, [wLinkMode]
 	cp LINK_COLOSSEUM
 	jr nz, .ready_to_trade
+	ld a, [wLinkOtherPlayerGender]
+	dec a
+	jr z, .is_female
 	ld a, CAL
+	jr .done
+.is_female
+	ld a, LINK_KRIS
+.done
 	ld [wOtherTrainerClass], a
 	call ClearScreen
 	farcall Link_WaitBGMap
@@ -2540,6 +2547,17 @@ TryQuickSave:
 	call DelayFrames
 	pop af
 	ld [wChosenCableClubRoom], a
+	ret
+
+CheckOtherPlayerGender:
+	ld a, [wPlayerGender]
+	call Link_EnsureSync
+	push af
+	call LinkDataReceived
+	call DelayFrame
+	call LinkDataReceived
+	pop af
+	ld [wLinkOtherPlayerGender], a
 	ret
 
 CheckBothSelectedSameRoom:

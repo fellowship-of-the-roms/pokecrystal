@@ -779,6 +779,7 @@ INCBIN "gfx/pokemon/unown_r/back.2bpp.lz"
 ; but entries for their banks exist in FixPicBank (see engine/gfx/load_pics.asm).
 
 SECTION "Pics 20", ROMX
+KrisPic:            INCBIN "gfx/trainers/kris.2bpp.lz"
 
 SECTION "Pics 21", ROMX
 
