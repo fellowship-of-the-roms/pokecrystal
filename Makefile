@@ -21,6 +21,7 @@ rom_obj := \
 	gfx/misc.o \
 	gfx/pics.o \
 	gfx/sprites.o \
+	gfx/following_sprites.o \
 	gfx/tilesets.o \
 	lib/mobile/main.o \
 	lib/mobile/mail.o

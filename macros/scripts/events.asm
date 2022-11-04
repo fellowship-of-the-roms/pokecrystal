@@ -1065,4 +1065,24 @@ MACRO checksave
 	db checksave_command
 ENDM
 
+	const freezefollower_command ; $aa
+MACRO freezefollower
+	db freezefollower_command
+ENDM
+
+	const unfreezefollower_command ; $ab
+MACRO unfreezefollower
+	db unfreezefollower_command
+ENDM
+
+	const getfollowerdirection_command ; $ac
+MACRO getfollowerdirection
+	db getfollowerdirection_command
+ENDM
+
+	const followcry_command ; $ad
+MACRO followcry
+	db followcry_command
+ENDM
+
 DEF NUM_EVENT_COMMANDS EQU const_value

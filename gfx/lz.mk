@@ -72,3 +72,5 @@ gfx/title/suicune.2bpp.lz: LZFLAGS += --align 4
 
 gfx/unown_puzzle/%.lz: LZFLAGS += --align 4
 gfx/unown_puzzle/start_cancel.2bpp.lz: LZFLAGS += --method 8 --align 1
+
+gfx/following/%.lz: LZFLAGS = --optimize

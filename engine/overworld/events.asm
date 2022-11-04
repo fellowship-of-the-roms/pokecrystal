@@ -125,6 +125,7 @@ EnterMap:
 	xor a
 	ld [wPoisonStepCount], a
 .dontresetpoison
+	farcall RefreshFollowingCoords
 
 	xor a ; end map entry
 	ldh [hMapEntryMethod], a
@@ -210,6 +211,36 @@ HandleMapBackground:
 	farcall _UpdateSprites
 	farcall ScrollScreen
 	farcall PlaceMapNameSign
+	ret
+
+Script_GetFollowerDirectionFromPlayer::
+	call GetFollowerDirectionFromPlayer
+	ld a, c
+	ld [wScriptVar], a
+	ret
+
+GetFollowerDirectionFromPlayer::
+	ld a, [wObject1MapX]
+	ld b, a
+	ld a, [wPlayerMapX]
+	cp b
+	jr z, .check_y
+	ld c, RIGHT
+	ret c
+	ld c, LEFT
+	ret
+
+.check_y
+	ld a, [wObject1MapY]
+	ld b, a
+	ld a, [wPlayerMapY]
+	cp b
+	ld c, STANDING
+	ret z
+	ld c, DOWN
+	ret c
+; nc
+	ld c, UP
 	ret
 
 CheckPlayerState:

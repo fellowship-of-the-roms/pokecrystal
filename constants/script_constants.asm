@@ -1,5 +1,6 @@
 ; object constants
 DEF PLAYER      EQU  0
+DEF FOLLOWER    EQU  1
 DEF LAST_TALKED EQU -2
 
 ; string buffer constants
@@ -72,6 +73,7 @@ DEF STRING_BUFFER_LENGTH EQU 19
 	const VAR_BLUECARDBALANCE  ; 18
 	const VAR_BUENASPASSWORD   ; 19
 	const VAR_KENJI_BREAK      ; 1a
+	const VAR_FOLLOWERSTATE    ; 1b
 DEF NUM_VARS EQU const_value
 
 ; variable action types

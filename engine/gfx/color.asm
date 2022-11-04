@@ -655,7 +655,7 @@ CGB_ApplyPartyMenuHPPals:
 InitPartyMenuOBPals:
 	ld hl, PartyMenuOBPals
 	ld de, wOBPals1
-	ld bc, 2 palettes
+	ld bc, 8 palettes
 	ld a, BANK(wOBPals1)
 	call FarCopyWRAM
 	ret
@@ -1332,6 +1332,19 @@ INCLUDE "gfx/pokegear/pokegear.pal"
 
 FemalePokegearPals:
 INCLUDE "gfx/pokegear/pokegear_f.pal"
+
+; Input: E must contain the offset of the selected palette from PartyMenuOBPals.
+SetFirstOBJPalette::
+	ld hl, PartyMenuOBPals
+	ld d, 0
+	add hl, de
+	ld de, wOBPals1
+	ld bc, 1 palettes
+	ld a, BANK(wOBPals1)
+	call FarCopyWRAM
+	ld a, TRUE
+	ldh [hCGBPalUpdate], a
+	jp ApplyPals
 
 BetaPokerPals:
 INCLUDE "gfx/beta_poker/beta_poker.pal"

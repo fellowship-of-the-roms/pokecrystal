@@ -84,6 +84,7 @@ RefreshSprites::
 	xor a
 	ld [hUsedSpriteIndex], a
 	call ReloadSpriteIndex
+	call LoadMiscTiles
 	pop bc
 	pop de
 	pop hl
@@ -155,6 +156,8 @@ SafeGetSprite:
 	ret
 
 GetSprite::
+	call GetFollowingSprite
+	ret c
 	call GetMonSprite
 	ret c
 
@@ -192,39 +195,28 @@ GetMonSprite:
 	jr z, .BreedMon2
 	cp SPRITE_VARS
 	jr nc, .Variable
-	jr .Icon
+	jr .pokemon_sprite
 
 .Normal:
 	and a
 	ret
 
-.Icon:
+.pokemon_sprite:
 	sub SPRITE_POKEMON
 	ld e, a
 	ld d, 0
 	ld hl, SpriteMons
 	add hl, de
 	ld a, [hl]
-	jr .Mon
+	jp GetWalkingMonSprite
 
 .BreedMon1
 	ld a, [wBreedMon1Species]
-	jr .Mon
+	jp GetWalkingMonSprite
 
 .BreedMon2
 	ld a, [wBreedMon2Species]
-
-.Mon:
-	ld e, a
-	and a
-	jr z, .NoBreedmon
-
-	farcall LoadOverworldMonIcon
-
-	ld l, WALKING_SPRITE
-	ld h, 0
-	scf
-	ret
+	jp GetWalkingMonSprite
 
 .Variable:
 	sub SPRITE_VARS
@@ -236,16 +228,110 @@ GetMonSprite:
 	and a
 	jp nz, GetMonSprite
 
-.NoBreedmon:
-	ld a, WALKING_SPRITE
-	ld l, WALKING_SPRITE
+GetFirstAliveMon::
+	ld e, 0
+	ld a, [wPartyCount]
+	ld d, a
+	and a
+	jr z, .none
+
+	ld hl, wPartyMon1HP
+	ld bc, wPartyMon2 - wPartyMon1
+.loop
+	ld a, [hli]
+	or [hl]
+	jr nz, .ok
+	inc e
+	ld a, e
+	cp d
+	jr nc, .none
+	add hl, bc
+	jr .loop
+.ok
+	ld bc, wPartyMon1Species - (wPartyMon1HP + 1)
+	add hl, bc
+	ld a, [hl]
+	ret
+.none
+	xor a
+	ret
+
+GetFollowingSprite:
+	cp SPRITE_FOLLOWER
+	jr nz, GetWalkingMonSprite.nope
+
+	call GetFirstAliveMon
+	ld [wFollowerSpriteID], a
+	push af
+	ld a, e
+	ld [wFollowerPartyNum], a
+	pop af
+
+GetWalkingMonSprite:
+	push af
+	dec a
+
+	ld hl, FollowingSpritePointers
+
+	cp (UNOWN - 1) ; we already decremented
+	jr nz, .not_unown
+	ld a, [wFollowerPartyNum]
+	ld bc, PARTYMON_STRUCT_LENGTH
+	ld hl, wPartyMon1DVs
+	call AddNTimes
+	predef GetUnownLetter
+	ld a, [wUnownLetter]
+	dec a
+	ld hl, UnownFollowingSpritePointers
+
+.not_unown
+	ld d, 0
+	ld e, a
+	add hl, de
+	add hl, de
+	add hl, de
+	assert BANK(FollowingSpritePointers) == BANK(UnownFollowingSpritePointers), \
+			"FollowingSpritePointers Bank is not equal to UnownFollowingSpritePointers"
+	ld a, BANK(FollowingSpritePointers)
+	push af
+	call GetFarByte
+	ld b, a
+	inc hl
+	pop af
+	call GetFarWord
+
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wDecompressScratch)
+	ldh [rSVBK], a
+
+	push bc
+	ld a, b
+	ld de, wDecompressScratch
+	call FarDecompress
+	pop bc
+	ld de, wDecompressScratch
+
+	pop af
+	ldh [rSVBK], a
+
 	ld h, 0
+	ld c, 12
+	ld l, WALKING_SPRITE
+
+	pop af
+
+	scf
+	ret
+.nope
 	and a
 	ret
 
 _DoesSpriteHaveFacings::
 ; Checks to see whether we can apply a facing to a sprite.
 ; Returns carry unless the sprite is a Pokemon or a Still Sprite.
+	cp SPRITE_FOLLOWER
+	jr z, .follower
 	cp SPRITE_POKEMON
 	jr nc, .only_down
 
@@ -265,11 +351,19 @@ _DoesSpriteHaveFacings::
 	scf
 	ret
 
+.follower
+	ld a, WALKING_SPRITE
+
 .only_down
 	and a
 	ret
 
 _GetSpritePalette::
+	ld a, c
+	push bc
+	call GetFollowingSprite
+	pop bc
+	jr c, .follower
 	ld a, c
 	call GetMonSprite
 	jr c, .is_pokemon
@@ -285,6 +379,16 @@ _GetSpritePalette::
 
 .is_pokemon
 	xor a
+	ld c, a
+	ret
+
+.follower
+	ld hl, FollowingPalettes
+	ld b, 0
+	ld c, a
+	add hl, bc
+	ld a, BANK(FollowingPalettes)
+	call GetFarByte
 	ld c, a
 	ret
 
@@ -454,7 +558,17 @@ endr
 
 .bankswitch
 	ldh [rVBK], a
+
+	ldh a, [rSVBK]
+	push af
+	ld a, BANK(wDecompressScratch)
+	ldh [rSVBK], a
+
 	call Get2bpp
+
+	pop af
+	ldh [rSVBK], a
+
 	pop af
 	ldh [rVBK], a
 	ret

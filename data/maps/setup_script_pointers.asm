@@ -58,3 +58,5 @@ MapSetupCommands:
 	add_mapsetup ApplyMapPalettes ; 2b
 	add_mapsetup EnableTextAcceleration ; 2c
 	add_mapsetup InitMapNameSign ; 2d
+	add_mapsetup MapPlayerCoordWarped ; 2e
+	add_mapsetup MapPlayerCoordConnected ; 2f

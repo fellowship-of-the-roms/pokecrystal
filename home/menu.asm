@@ -70,6 +70,7 @@ PushWindow::
 ExitMenu::
 	push af
 	callfar _ExitMenu
+	call UpdateFollowPalette
 	pop af
 	ret
 
@@ -83,6 +84,12 @@ CloseWindow::
 	call ApplyTilemap
 	call UpdateSprites
 	pop af
+	ret
+
+UpdateFollowPalette:
+	ld a, SPRITE_FOLLOWER
+	call GetSpritePalette
+	ld [wObject1Palette], a
 	ret
 
 RestoreTileBackup::
@@ -331,9 +338,6 @@ MenuTextbox::
 	pop hl
 	jp PrintText
 
-Menu_DummyFunction:: ; unreferenced
-	ret
-
 LoadMenuTextbox::
 	ld hl, .MenuHeader
 	call LoadMenuHeader
@@ -420,10 +424,6 @@ YesNoBox::
 
 PlaceYesNoBox::
 	jr _YesNoBox
-
-PlaceGenericTwoOptionBox:: ; unreferenced
-	call LoadMenuHeader
-	jr InterpretTwoOptionMenu
 
 _YesNoBox::
 ; Return nc (yes) or c (no).
@@ -723,15 +723,6 @@ PlaceNthMenuStrings::
 	call PlaceString
 	ret
 
-GetNthMenuStrings:: ; unreferenced
-	call GetMenuDataPointerTableEntry
-	inc hl
-	inc hl
-	ld a, [hli]
-	ld d, [hl]
-	ld e, a
-	ret
-
 MenuJumptable::
 	ld a, [wMenuSelection]
 	call GetMenuDataPointerTableEntry
@@ -839,12 +830,5 @@ InterpretBattleMenu::
 	ldh a, [hROMBank]
 	ld [wMenuData_2DMenuItemStringsBank], a
 	farcall _InterpretBattleMenu
-	ld a, [wMenuCursorPosition]
-	ret
-
-InterpretMobileMenu:: ; unreferenced
-	ldh a, [hROMBank]
-	ld [wMenuData_2DMenuItemStringsBank], a
-	farcall _InterpretMobileMenu
 	ld a, [wMenuCursorPosition]
 	ret
