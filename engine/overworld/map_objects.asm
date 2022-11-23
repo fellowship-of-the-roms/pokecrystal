@@ -412,20 +412,17 @@ CheckFollowerInvisOneStep:
 	ret z
 	push hl
 	push bc
+	push de
 	call IsObjectStandingOnSomeoneElse
-	jr c, .standing_on_object
+	pop de
 	pop bc
 	pop hl
+	ret c
 	res FOLLOWER_INVISIBLE_F, [hl]
 	res FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
 	ld hl, OBJECT_FLAGS1
 	add hl, bc
 	res INVISIBLE_F, [hl]
-	ret
-
-.standing_on_object
-	pop bc
-	pop hl
 	ret
 
 AddStepVector:
