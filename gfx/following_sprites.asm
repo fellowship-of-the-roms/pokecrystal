@@ -273,9 +273,10 @@ Ho_ohFollowingSprite::     INCBIN "gfx/following/ho_oh.2bpp.lz"
 CelebiFollowingSprite::    INCBIN "gfx/following/celebi.2bpp.lz"
 
 
-SECTION "EggSprite", ROMX
+SECTION "MiscSprites", ROMX
 EggSprite::
 EggFollowingSprite:: INCBIN "gfx/following/egg.2bpp.lz"
+PokeballSprite::     INCBIN "gfx/following/pokeball.2bpp.lz"
 
 
 SECTION "UnownSprites", ROMX
