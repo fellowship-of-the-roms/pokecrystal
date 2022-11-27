@@ -147,6 +147,7 @@ RefreshPlayerCoords:
 
 MapPlayerCoordWarped:
 	ld hl, wFollowerFlags
+	res FOLLOWER_USING_POKEBALL_F, [hl]
 	set FOLLOWER_INVISIBLE_F, [hl]
 	set FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
 	call _RefreshPlayerCoords

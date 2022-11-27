@@ -396,11 +396,43 @@ UpdateFollowerSprite:
 	ret
 
 .water_tile
-	ld hl, OBJECT_FLAGS1
+	push hl
+	push bc
+	push de
+	ldh a, [rVBK]
+	push af
+	ld a, BANK(vTiles3)
+	ldh [rVBK], a
+	ld hl, PokeballSprite
+	ld de, vTiles3 tile $0c
+	lb bc, BANK(PokeballSprite), 12
+	call DecompressRequest2bpp
+	ld hl, PokeballSprite
+	ld de, vTiles4 tile $0c
+	lb bc, BANK(PokeballSprite), 12
+	call DecompressRequest2bpp
+	pop af
+	ldh [rVBK], a
+	pop de
+	pop bc
+	pop hl
+	ld hl, OBJECT_PALETTE
 	add hl, bc
-	set INVISIBLE_F, [hl]
+	xor a
+	ld [hl], a
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	ld [hl], 5
+	ld hl, OBJECT_STEP_TYPE
+	add hl, bc
+	ld [hl], STEP_TYPE_POKEBALL_CLOSE
 	ld hl, wFollowerFlags
-	set FOLLOWER_INVISIBLE_F, [hl]
+	set FOLLOWER_USING_POKEBALL_F, [hl]
+;	ld hl, OBJECT_FLAGS1
+;	add hl, bc
+;	set INVISIBLE_F, [hl]
+;	ld hl, wFollowerFlags
+;	set FOLLOWER_INVISIBLE_F, [hl]
 	ret
 
 CheckFollowerInvisOneStep:
@@ -1298,6 +1330,7 @@ StepTypesJumptable:
 	dw StepFunction_17              ; 17
 	dw StepFunction_Delete          ; 18
 	dw StepFunction_SkyfallTop      ; 19
+	dw StepFunction_PokeballClose   ; 20
 	assert_table_length NUM_STEP_TYPES
 
 WaitStep_InPlace:
@@ -1308,6 +1341,54 @@ WaitStep_InPlace:
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_FROM_MOVEMENT
+	ret
+
+StepFunction_PokeballClose:
+	call ObjectStep_AnonJumptable
+.anon_dw
+	dw .Open
+	dw .Closing
+	dw .Closed
+
+.Open:
+	ld hl, OBJECT_DIRECTION
+	add hl, bc
+	ld [hl], OW_DOWN
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	ret nz
+	ld [hl], 5
+	jp ObjectStep_IncAnonJumptableIndex
+
+.Closing:
+	ld hl, OBJECT_DIRECTION
+	add hl, bc
+	ld [hl], OW_UP
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	ret nz
+	ld [hl], 5
+	jp ObjectStep_IncAnonJumptableIndex
+
+.Closed:
+	ld hl, OBJECT_DIRECTION
+	add hl, bc
+	ld [hl], OW_LEFT
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	ret nz
+	ld hl, OBJECT_STEP_TYPE
+	add hl, bc
+	ld [hl], STEP_TYPE_FROM_MOVEMENT
+	ld hl, OBJECT_FLAGS1
+	add hl, bc
+	set INVISIBLE_F, [hl]
+	ld hl, wFollowerFlags
+	res FOLLOWER_USING_POKEBALL_F, [hl]
+	set FOLLOWER_INVISIBLE_F, [hl]
 	ret
 
 StepFunction_NPCJump:

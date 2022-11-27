@@ -686,6 +686,10 @@ NormalStep:
 	cp [hl]
 	jr z, .player
 
+	ld hl, wFollowerFlags
+	bit FOLLOWER_USING_POKEBALL_F, [hl]
+	ret nz
+
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_NPC_WALK
