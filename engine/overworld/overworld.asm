@@ -147,6 +147,8 @@ LoadMiscTiles:
 	ld c, EMOTE_BOULDER_DUST
 .outdoor
 	farcall LoadEmote
+	ld c, EMOTE_POKE_BALL
+	farcall LoadEmote
 	ret
 
 SafeGetSprite:

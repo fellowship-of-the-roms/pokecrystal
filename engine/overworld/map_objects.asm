@@ -388,51 +388,16 @@ UpdateFollowerSprite:
 	ret
 
 .land_tile
-	ld hl, OBJECT_FLAGS1
-	add hl, bc
-	res INVISIBLE_F, [hl]
-	ld hl, wFollowerFlags
-	res FOLLOWER_INVISIBLE_F, [hl]
+	call SpawnPokeballOpening
 	ret
 
 .water_tile
-	push hl
-	push bc
-	push de
-	ldh a, [rVBK]
-	push af
-	ld a, BANK(vTiles3)
-	ldh [rVBK], a
-	ld hl, PokeballSprite
-	ld de, vTiles3 tile $0c
-	lb bc, BANK(PokeballSprite), 12
-	call DecompressRequest2bpp
-	ld hl, PokeballSprite
-	ld de, vTiles4 tile $0c
-	lb bc, BANK(PokeballSprite), 12
-	call DecompressRequest2bpp
-	pop af
-	ldh [rVBK], a
-	pop de
-	pop bc
-	pop hl
-	ld hl, OBJECT_PALETTE
+	ld hl, OBJECT_FLAGS1
 	add hl, bc
-	xor a
-	ld [hl], a
-	ld hl, OBJECT_STEP_DURATION
-	add hl, bc
-	ld [hl], 5
-	ld hl, OBJECT_STEP_TYPE
-	add hl, bc
-	ld [hl], STEP_TYPE_POKEBALL_CLOSE
+	set INVISIBLE_F, [hl]
 	ld hl, wFollowerFlags
-	set FOLLOWER_USING_POKEBALL_F, [hl]
-;	ld hl, OBJECT_FLAGS1
-;	add hl, bc
-;	set INVISIBLE_F, [hl]
-;	ld hl, wFollowerFlags
-;	set FOLLOWER_INVISIBLE_F, [hl]
+	set FOLLOWER_INVISIBLE_F, [hl]
+	call SpawnPokeballClosing
 	ret
 
 CheckFollowerInvisOneStep:
@@ -450,11 +415,8 @@ CheckFollowerInvisOneStep:
 	pop bc
 	pop hl
 	ret c
-	res FOLLOWER_INVISIBLE_F, [hl]
 	res FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
-	ld hl, OBJECT_FLAGS1
-	add hl, bc
-	res INVISIBLE_F, [hl]
+	call SpawnPokeballOpening
 	ret
 
 AddStepVector:
@@ -688,6 +650,8 @@ StepFunction_FromMovement:
 	dw MovementFunction_BoulderDust          ; 1a
 	dw MovementFunction_ShakingGrass         ; 1b
 	dw MovementFunction_FollowerObj          ; 1c
+	dw MovementFunction_Pokeball_Opening     ; 1d
+	dw MovementFunction_Pokeball_Closing     ; 1e
 	assert_table_length NUM_SPRITEMOVEFN
 
 MovementFunction_Null:
@@ -1113,6 +1077,32 @@ MovementFunction_Shadow:
 	ld [hl], STEP_TYPE_TRACKING_OBJECT
 	ret
 
+MovementFunction_Pokeball_Opening:
+	ld hl, OBJECT_RANGE
+	add hl, bc
+	ld [hl], FOLLOWER
+	call InitMovementField1dField1e
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	ld [hl], 5
+	ld hl, OBJECT_STEP_TYPE
+	add hl, bc
+	ld [hl], STEP_TYPE_POKEBALL_OPENING
+	ret
+
+MovementFunction_Pokeball_Closing:
+	ld hl, OBJECT_RANGE
+	add hl, bc
+	ld [hl], FOLLOWER
+	call InitMovementField1dField1e
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	ld [hl], 5
+	ld hl, OBJECT_STEP_TYPE
+	add hl, bc
+	ld [hl], STEP_TYPE_POKEBALL_CLOSING
+	ret
+
 MovementFunction_Emote:
 	call EndSpriteMovement
 	call InitMovementField1dField1e
@@ -1330,7 +1320,8 @@ StepTypesJumptable:
 	dw StepFunction_17              ; 17
 	dw StepFunction_Delete          ; 18
 	dw StepFunction_SkyfallTop      ; 19
-	dw StepFunction_PokeballClose   ; 20
+	dw StepFunction_PokeballOpening ; 1b
+	dw StepFunction_PokeballClosing ; 1a
 	assert_table_length NUM_STEP_TYPES
 
 WaitStep_InPlace:
@@ -1343,7 +1334,83 @@ WaitStep_InPlace:
 	ld [hl], STEP_TYPE_FROM_MOVEMENT
 	ret
 
-StepFunction_PokeballClose:
+PokeballTracking:
+	ld hl, OBJECT_1D
+	add hl, bc
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ld hl, OBJECT_SPRITE
+	add hl, de
+	ld a, [hl]
+	and a
+	ret z
+	ld hl, OBJECT_SPRITE_X
+	add hl, de
+	ld a, [hl]
+	ld hl, OBJECT_SPRITE_X
+	add hl, bc
+	ld [hl], a
+	ld hl, OBJECT_SPRITE_Y
+	add hl, de
+	ld a, [hl]
+	ld hl, OBJECT_SPRITE_Y
+	add hl, bc
+	ld [hl], a
+	ret
+
+StepFunction_PokeballOpening:
+	call ObjectStep_AnonJumptable
+.anon_dw
+	dw .Closed
+	dw .Opening
+	dw .Open
+
+.Closed:
+	ld hl, OBJECT_DIRECTION
+	add hl, bc
+	ld [hl], OW_LEFT
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	jp nz, PokeballTracking
+	ld [hl], 5
+	call ObjectStep_IncAnonJumptableIndex
+	jp PokeballTracking
+
+.Opening:
+	ld hl, OBJECT_DIRECTION
+	add hl, bc
+	ld [hl], OW_UP
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	jp nz, PokeballTracking
+	ld [hl], 5
+	call ObjectStep_IncAnonJumptableIndex
+	jp PokeballTracking
+
+.Open:
+	ld hl, OBJECT_DIRECTION
+	add hl, bc
+	ld [hl], OW_DOWN
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	jp nz, PokeballTracking
+	ld hl, OBJECT_1D
+	add hl, bc
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ld hl, OBJECT_FLAGS1
+	add hl, de
+	res INVISIBLE_F, [hl]
+	ld hl, wFollowerFlags
+	res FOLLOWER_INVISIBLE_F, [hl]
+	jp DeleteMapObject
+
+StepFunction_PokeballClosing:
 	call ObjectStep_AnonJumptable
 .anon_dw
 	dw .Open
@@ -1357,9 +1424,10 @@ StepFunction_PokeballClose:
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
 	dec [hl]
-	ret nz
+	jp nz, PokeballTracking
 	ld [hl], 5
-	jp ObjectStep_IncAnonJumptableIndex
+	call ObjectStep_IncAnonJumptableIndex
+	jp PokeballTracking
 
 .Closing:
 	ld hl, OBJECT_DIRECTION
@@ -1368,9 +1436,10 @@ StepFunction_PokeballClose:
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
 	dec [hl]
-	ret nz
+	jp nz, PokeballTracking
 	ld [hl], 5
-	jp ObjectStep_IncAnonJumptableIndex
+	call ObjectStep_IncAnonJumptableIndex
+	jp PokeballTracking
 
 .Closed:
 	ld hl, OBJECT_DIRECTION
@@ -1379,17 +1448,8 @@ StepFunction_PokeballClose:
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
 	dec [hl]
-	ret nz
-	ld hl, OBJECT_STEP_TYPE
-	add hl, bc
-	ld [hl], STEP_TYPE_FROM_MOVEMENT
-	ld hl, OBJECT_FLAGS1
-	add hl, bc
-	set INVISIBLE_F, [hl]
-	ld hl, wFollowerFlags
-	res FOLLOWER_USING_POKEBALL_F, [hl]
-	set FOLLOWER_INVISIBLE_F, [hl]
-	ret
+	jp nz, PokeballTracking
+	jp DeleteMapObject
 
 StepFunction_NPCJump:
 	call ObjectStep_AnonJumptable
@@ -2312,6 +2372,30 @@ GetFollowerNextMovementIndex:
 	scf
 	ret
 
+SpawnPokeballOpening:
+	push bc
+	ld de, .PokeballOpeningObject
+	call CopyTempObjectData
+	call InitTempObject
+	pop bc
+	ret
+
+.PokeballOpeningObject:
+	; vtile, palette, movement
+	db $40, PAL_OW_RED, SPRITEMOVEDATA_POKEBALL_OPENING
+
+SpawnPokeballClosing:
+	push bc
+	ld de, .PokeballClosingObject
+	call CopyTempObjectData
+	call InitTempObject
+	pop bc
+	ret
+
+.PokeballClosingObject:
+	; vtile, palette, movement
+	db $40, PAL_OW_RED, SPRITEMOVEDATA_POKEBALL_CLOSING
+
 SpawnShadow:
 	push bc
 	ld de, .ShadowObject
@@ -2420,6 +2504,14 @@ InitTempObject:
 	farcall CopyTempObjectToObjectStruct
 	ret
 
+CopySpriteTempObjectData:
+	ld hl, wTempObjectCopyMapObjectIndex
+	ld [hl], -1
+	inc hl
+	ld a, [de]
+	inc de
+	ld [hli], a
+	jr CopyTempObjectData.sprite_vtile
 CopyTempObjectData:
 ; load into wTempObjectCopy:
 ; -1, -1, [de], [de + 1], [de + 2], [hMapObjectIndex], [NextMapX], [NextMapY], -1
@@ -2429,6 +2521,7 @@ CopyTempObjectData:
 	inc hl
 	ld [hl], -1
 	inc hl
+.sprite_vtile
 	ld a, [de]
 	inc de
 	ld [hli], a

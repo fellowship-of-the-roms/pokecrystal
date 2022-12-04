@@ -306,6 +306,22 @@ SpriteMovementData::
 	db 0 ; flags2
 	db 0 ; palette flags
 
+; SPRITEMOVEDATA_POKEBALL_OPENING
+	db SPRITEMOVEFN_POKEBALL_OPENING ; movement function
+	db DOWN ; facing
+	db OBJECT_ACTION_STAND ; action
+	db WONT_DELETE | SLIDING | EMOTE_OBJECT ; flags1
+	db HIGH_PRIORITY ; flags2
+	db 0 ; palette flags
+
+; SPRITEMOVEDATA_POKEBALL_CLOSING
+	db SPRITEMOVEFN_POKEBALL_CLOSING ; movement function
+	db DOWN ; facing
+	db OBJECT_ACTION_STAND ; action
+	db WONT_DELETE | SLIDING | EMOTE_OBJECT ; flags1
+	db HIGH_PRIORITY ; flags2
+	db 0 ; palette flags
+
 	assert_table_length NUM_SPRITEMOVEDATA
 
 ; unused
