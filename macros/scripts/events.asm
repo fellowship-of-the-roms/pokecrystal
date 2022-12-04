@@ -1090,4 +1090,9 @@ MACRO stowfollower
 	db stowfollower_command
 ENDM
 
+	const appearfollower_command ; $af
+MACRO appearfollower
+	db appearfollower_command
+ENDM
+
 DEF NUM_EVENT_COMMANDS EQU const_value

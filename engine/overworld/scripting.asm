@@ -239,6 +239,7 @@ ScriptCommandTable:
 	dw Script_getfollowerdirection       ; ac
 	dw Script_followcry                  ; ad
 	dw Script_stowfollower               ; ae
+	dw Script_appearfollower             ; af
 	assert_table_length NUM_EVENT_COMMANDS
 
 StartScript:
@@ -969,6 +970,7 @@ Script_variablesprite:
 
 Script_appear:
 	call GetScriptByte
+.skip_input:
 	call GetScriptObject
 	call UnmaskCopyMapObjectStruct
 	ldh a, [hMapObjectIndex]
@@ -2370,18 +2372,18 @@ Script_followcry:
 	jp PlayMonCry
 
 Script_stowfollower:
+	farcall _StowFollower
+	ret
+
+Script_appearfollower:
+	ld a, FOLLOWER
+	call Script_appear.skip_input
 	ld bc, wObject1Struct
-	call DoesObjectHaveASprite
-	ret z
 	ld hl, OBJECT_FLAGS1
 	add hl, bc
 	set INVISIBLE_F, [hl]
 	ld hl, wFollowerFlags
 	set FOLLOWER_INVISIBLE_F, [hl]
 	set FOLLOWER_IN_POKEBALL_F, [hl]
-	farcall SpawnPokeballClosing
-	ld a, 10
-	ld [wScriptDelay], a
-	ld a, SCRIPT_WAIT
-	ld [wScriptMode], a
-	jp StopScript
+	jp SpawnPokeballOpening
+

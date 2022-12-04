@@ -1093,7 +1093,7 @@ MovementFunction_Pokeball_Opening:
 	call InitMovementField1dField1e
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
-	ld [hl], 3
+	ld [hl], 4
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_POKEBALL_OPENING
@@ -1106,7 +1106,7 @@ MovementFunction_Pokeball_Closing:
 	call InitMovementField1dField1e
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
-	ld [hl], 3
+	ld [hl], 4
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_POKEBALL_CLOSING
@@ -1383,7 +1383,7 @@ StepFunction_PokeballOpening:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 3
+	ld [hl], 4
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -1395,7 +1395,7 @@ StepFunction_PokeballOpening:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 3
+	ld [hl], 4
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -1435,7 +1435,7 @@ StepFunction_PokeballClosing:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 3
+	ld [hl], 4
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -1447,7 +1447,7 @@ StepFunction_PokeballClosing:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 3
+	ld [hl], 4
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -3068,6 +3068,19 @@ _UnfreezeFollowerObject::
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
 	res FROZEN_F, [hl]
+	ret
+
+_StowFollower::
+	ld bc, wObject1Struct
+	call DoesObjectHaveASprite
+	ret z
+	ld hl, OBJECT_FLAGS1
+	add hl, bc
+	set INVISIBLE_F, [hl]
+	ld hl, wFollowerFlags
+	set FOLLOWER_INVISIBLE_F, [hl]
+	set FOLLOWER_IN_POKEBALL_F, [hl]
+	farcall SpawnPokeballClosing
 	ret
 
 UnfreezeAllObjects::
