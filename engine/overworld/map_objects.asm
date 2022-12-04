@@ -1084,7 +1084,7 @@ MovementFunction_Pokeball_Opening:
 	call InitMovementField1dField1e
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
-	ld [hl], 5
+	ld [hl], 3
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_POKEBALL_OPENING
@@ -1097,7 +1097,7 @@ MovementFunction_Pokeball_Closing:
 	call InitMovementField1dField1e
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
-	ld [hl], 5
+	ld [hl], 3
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_POKEBALL_CLOSING
@@ -1374,7 +1374,7 @@ StepFunction_PokeballOpening:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 5
+	ld [hl], 3
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -1386,7 +1386,7 @@ StepFunction_PokeballOpening:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 5
+	ld [hl], 3
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -1425,7 +1425,7 @@ StepFunction_PokeballClosing:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 5
+	ld [hl], 3
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
@@ -1437,7 +1437,7 @@ StepFunction_PokeballClosing:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
-	ld [hl], 5
+	ld [hl], 3
 	call ObjectStep_IncAnonJumptableIndex
 	jp PokeballTracking
 
