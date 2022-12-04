@@ -1085,4 +1085,9 @@ MACRO followcry
 	db followcry_command
 ENDM
 
+	const stowfollower_command ; $ae
+MACRO stowfollower
+	db stowfollower_command
+ENDM
+
 DEF NUM_EVENT_COMMANDS EQU const_value

@@ -238,6 +238,7 @@ ScriptCommandTable:
 	dw Script_unfreezefollower           ; ab
 	dw Script_getfollowerdirection       ; ac
 	dw Script_followcry                  ; ad
+	dw Script_stowfollower               ; ae
 	assert_table_length NUM_EVENT_COMMANDS
 
 StartScript:
@@ -2094,8 +2095,7 @@ Script_warp:
 	ldh [hMapEntryMethod], a
 	ld a, MAPSTATUS_ENTER
 	call LoadMapStatus
-	call StopScript
-	ret
+	jp StopScript
 
 Script_warpmod:
 	call GetScriptByte
@@ -2147,8 +2147,7 @@ Script_changemapblocks:
 	call GetScriptByte
 	ld [wMapBlocksPointer + 1], a
 	call ChangeMap
-	call BufferScreen
-	ret
+	jp BufferScreen
 
 Script_changeblock:
 	call GetScriptByte
@@ -2160,8 +2159,7 @@ Script_changeblock:
 	call GetBlockLocation
 	call GetScriptByte
 	ld [hl], a
-	call BufferScreen
-	ret
+	jp BufferScreen
 
 Script_refreshmap::
 	xor a
@@ -2169,8 +2167,7 @@ Script_refreshmap::
 	call LoadOverworldTilemapAndAttrmapPals
 	call GetMovementPermissions
 	farcall HDMATransferTilemapAndAttrmap_Overworld
-	call UpdateSprites
-	ret
+	jp UpdateSprites
 
 Script_warpcheck:
 	call WarpCheck
@@ -2183,21 +2180,18 @@ Script_newloadmap:
 	ldh [hMapEntryMethod], a
 	ld a, MAPSTATUS_ENTER
 	call LoadMapStatus
-	call StopScript
-	ret
+	jp StopScript
 
 Script_reloadend:
 	call Script_newloadmap
 	jp Script_end
 
 Script_opentext:
-	call OpenText
-	ret
+	jp OpenText
 
 Script_reanchormap:
 	call ReanchorMap
-	call GetScriptByte
-	ret
+	jp GetScriptByte
 
 Script_writeunusedbyte:
 	call GetScriptByte
@@ -2206,8 +2200,7 @@ Script_writeunusedbyte:
 
 Script_closetext:
 	call HDMATransferTilemapAndAttrmap_Menu
-	call CloseText
-	ret
+	jp CloseText
 
 Script_autoinput:
 	call GetScriptByte
@@ -2217,8 +2210,7 @@ Script_autoinput:
 	call GetScriptByte
 	ld h, a
 	pop af
-	call StartAutoInput
-	ret
+	jp StartAutoInput
 
 Script_pause:
 	call GetScriptByte
@@ -2260,8 +2252,7 @@ Script_end:
 	ld [wScriptMode], a
 	ld hl, wScriptFlags
 	res UNUSED_SCRIPT_FLAG_0, [hl]
-	call StopScript
-	ret
+	jp StopScript
 
 Script_endcallback:
 	call ExitScriptSubroutine
@@ -2269,8 +2260,7 @@ Script_endcallback:
 .dummy
 	ld hl, wScriptFlags
 	res UNUSED_SCRIPT_FLAG_0, [hl]
-	call StopScript
-	ret
+	jp StopScript
 
 ExitScriptSubroutine:
 ; Return carry if there's no parent to return to.
@@ -2310,8 +2300,7 @@ Script_endall:
 	ld [wScriptMode], a
 	ld hl, wScriptFlags
 	res UNUSED_SCRIPT_FLAG_0, [hl]
-	call StopScript
-	ret
+	jp StopScript
 
 Script_halloffame:
 	ld hl, wGameTimerPaused
@@ -2329,8 +2318,7 @@ ReturnFromCredits:
 	call Script_endall
 	ld a, MAPSTATUS_DONE
 	call LoadMapStatus
-	call StopScript
-	ret
+	jp StopScript
 
 Script_wait:
 	push bc
@@ -2380,3 +2368,20 @@ Script_getfollowerdirection:
 Script_followcry:
 	ld a, [wFollowerSpriteID]
 	jp PlayMonCry
+
+Script_stowfollower:
+	ld bc, wObject1Struct
+	call DoesObjectHaveASprite
+	ret z
+	ld hl, OBJECT_FLAGS1
+	add hl, bc
+	set INVISIBLE_F, [hl]
+	ld hl, wFollowerFlags
+	set FOLLOWER_INVISIBLE_F, [hl]
+	set FOLLOWER_IN_POKEBALL_F, [hl]
+	farcall SpawnPokeballClosing
+	ld a, 10
+	ld [wScriptDelay], a
+	ld a, SCRIPT_WAIT
+	ld [wScriptMode], a
+	jp StopScript

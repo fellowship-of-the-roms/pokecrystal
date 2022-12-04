@@ -388,6 +388,9 @@ UpdateFollowerSprite:
 	ret
 
 .land_tile
+	ld hl, wFollowerFlags
+	bit FOLLOWER_IN_POKEBALL_F, [hl]
+	ret z
 	call SpawnPokeballOpening
 	ret
 
@@ -397,6 +400,7 @@ UpdateFollowerSprite:
 	set INVISIBLE_F, [hl]
 	ld hl, wFollowerFlags
 	set FOLLOWER_INVISIBLE_F, [hl]
+	set FOLLOWER_IN_POKEBALL_F, [hl]
 	call SpawnPokeballClosing
 	ret
 
@@ -416,7 +420,12 @@ CheckFollowerInvisOneStep:
 	pop hl
 	ret c
 	res FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
-	call SpawnPokeballOpening
+	bit FOLLOWER_IN_POKEBALL_F, [hl]
+	jp nz, SpawnPokeballOpening
+	res FOLLOWER_INVISIBLE_F, [hl]
+	ld hl, OBJECT_FLAGS1
+	add hl, bc
+	res INVISIBLE_F, [hl]
 	ret
 
 AddStepVector:
@@ -1408,6 +1417,7 @@ StepFunction_PokeballOpening:
 	res INVISIBLE_F, [hl]
 	ld hl, wFollowerFlags
 	res FOLLOWER_INVISIBLE_F, [hl]
+	res FOLLOWER_IN_POKEBALL_F, [hl]
 	jp DeleteMapObject
 
 StepFunction_PokeballClosing:
@@ -2372,7 +2382,7 @@ GetFollowerNextMovementIndex:
 	scf
 	ret
 
-SpawnPokeballOpening:
+SpawnPokeballOpening::
 	push bc
 	ld de, .PokeballOpeningObject
 	call CopyTempObjectData
@@ -2382,9 +2392,9 @@ SpawnPokeballOpening:
 
 .PokeballOpeningObject:
 	; vtile, palette, movement
-	db $40, PAL_OW_RED, SPRITEMOVEDATA_POKEBALL_OPENING
+	db $f0, PAL_OW_RED, SPRITEMOVEDATA_POKEBALL_OPENING
 
-SpawnPokeballClosing:
+SpawnPokeballClosing::
 	push bc
 	ld de, .PokeballClosingObject
 	call CopyTempObjectData
@@ -2394,7 +2404,7 @@ SpawnPokeballClosing:
 
 .PokeballClosingObject:
 	; vtile, palette, movement
-	db $40, PAL_OW_RED, SPRITEMOVEDATA_POKEBALL_CLOSING
+	db $f0, PAL_OW_RED, SPRITEMOVEDATA_POKEBALL_CLOSING
 
 SpawnShadow:
 	push bc
@@ -3302,11 +3312,21 @@ InitSprites:
 	ld hl, OBJECT_SPRITE_TILE
 	add hl, bc
 	ld a, [hl]
+	ldh [hCurSpriteTile], a
+	ld hl, OBJECT_SPRITE
+	add hl, bc
+	ld a, [hl]
+	inc a
+	jr z, .vram_1
+	ld hl, OBJECT_SPRITE_TILE
+	add hl, bc
+	ld a, [hl]
 	and ~(1 << 7)
 	ldh [hCurSpriteTile], a
 	xor a
 	bit 7, [hl] ; tiles $80+ are in VRAM bank 0
 	jr nz, .not_vram1
+.vram_1
 	or OAM_BANK1
 .not_vram1
 	ld hl, OBJECT_FLAGS2

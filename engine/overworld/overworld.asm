@@ -138,6 +138,9 @@ LoadMiscTiles:
 	bit SPRITES_SKIP_WALKING_GFX_F, a
 	ret nz
 
+	ld c, EMOTE_POKE_BALL
+	farcall LoadEmote
+
 	ld c, EMOTE_SHADOW
 	farcall LoadEmote
 	call GetMapEnvironment
@@ -146,8 +149,6 @@ LoadMiscTiles:
 	jr z, .outdoor
 	ld c, EMOTE_BOULDER_DUST
 .outdoor
-	farcall LoadEmote
-	ld c, EMOTE_POKE_BALL
 	farcall LoadEmote
 	ret
 
