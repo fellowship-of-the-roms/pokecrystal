@@ -232,31 +232,28 @@ GetMonSprite:
 	jp nz, GetMonSprite
 
 GetFirstAliveMon::
-	ld e, 0
 	ld a, [wPartyCount]
-	ld d, a
 	and a
-	jr z, .none
-
-	ld hl, wPartyMon1HP
-	ld bc, wPartyMon2 - wPartyMon1
+	ret z
+	ld e, a
+	ld bc, wPartyMon1
 .loop
+	ld hl, MON_HP
+	add hl, bc
 	ld a, [hli]
-	or [hl]
-	jr nz, .ok
-	inc e
-	ld a, e
-	cp d
-	jr nc, .none
-	add hl, bc
-	jr .loop
-.ok
-	ld bc, wPartyMon1Species - (wPartyMon1HP + 1)
-	add hl, bc
+	ld d, a
 	ld a, [hl]
-	ret
-.none
-	xor a
+	or d
+	jr nz, .got_mon_struct
+	dec e
+	ret z
+	ld hl, PARTYMON_STRUCT_LENGTH
+	add hl, bc
+	ld b, h
+	ld c, l
+	jr .loop
+.got_mon_struct
+	ld a, [bc]
 	ret
 
 GetFollowingSprite:

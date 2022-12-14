@@ -363,10 +363,10 @@ HideFollowerIfNPCBump:
 UpdateFollowerSprite:
 	ld e, a
 	ldh a, [hMapObjectIndex]
+	call CheckFollowerInvisOneStep
 	cp FOLLOWER
 	ld a, e
 	ret nz
-	call CheckFollowerInvisOneStep
 	ld hl, OBJECT_TILE_COLLISION
 	add hl, bc
 	ld d, [hl]
@@ -406,26 +406,37 @@ UpdateFollowerSprite:
 
 CheckFollowerInvisOneStep:
 	; Although the below could be optimized, it is currently easier to understand.
+	cp PLAYER
+	ret nz
 	ld hl, wFollowerFlags
 	bit FOLLOWER_INVISIBLE_F, [hl]
 	ret z
 	bit FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
 	ret z
-	push hl
-	push bc
-	push de
-	call IsObjectStandingOnSomeoneElse
-	pop de
-	pop bc
-	pop hl
+;	push hl
+;	push bc
+;	push de
+;	ld bc, wObject1Struct
+;	call IsObjectStandingOnSomeoneElse
+;	pop de
+;	pop bc
+;	pop hl
 	ret c
 	res FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
 	bit FOLLOWER_IN_POKEBALL_F, [hl]
-	jp nz, SpawnPokeballOpening
+	push bc
+	ld bc, wObject1Struct
+	jp nz, .spawn_pokeball
 	res FOLLOWER_INVISIBLE_F, [hl]
 	ld hl, OBJECT_FLAGS1
 	add hl, bc
 	res INVISIBLE_F, [hl]
+	pop bc
+	ret
+
+.spawn_pokeball
+	call SpawnPokeballOpening
+	pop bc
 	ret
 
 AddStepVector:
@@ -1097,6 +1108,8 @@ MovementFunction_Pokeball_Opening:
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_POKEBALL_OPENING
+	ld hl, wFollowerFlags
+	set FOLLOWER_EXITING_BALL_F, [hl]
 	ret
 
 MovementFunction_Pokeball_Closing:
@@ -1110,6 +1123,8 @@ MovementFunction_Pokeball_Closing:
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_POKEBALL_CLOSING
+	ld hl, wFollowerFlags
+	set FOLLOWER_ENTERING_BALL_F, [hl]
 	ret
 
 MovementFunction_Emote:
@@ -1418,6 +1433,7 @@ StepFunction_PokeballOpening:
 	ld hl, wFollowerFlags
 	res FOLLOWER_INVISIBLE_F, [hl]
 	res FOLLOWER_IN_POKEBALL_F, [hl]
+	res FOLLOWER_EXITING_BALL_F, [hl]
 	jp DeleteMapObject
 
 StepFunction_PokeballClosing:
@@ -1459,6 +1475,9 @@ StepFunction_PokeballClosing:
 	add hl, bc
 	dec [hl]
 	jp nz, PokeballTracking
+	ld hl, wFollowerFlags
+	set FOLLOWER_IN_POKEBALL_F, [hl]
+	res FOLLOWER_ENTERING_BALL_F, [hl]
 	jp DeleteMapObject
 
 StepFunction_NPCJump:
@@ -2469,7 +2488,7 @@ ShakeScreen:
 	; vtile, palette, movement
 	db $00, PAL_OW_EMOTE, SPRITEMOVEDATA_SCREENSHAKE
 
-DespawnEmote:
+DespawnEmote::
 	push bc
 	ldh a, [hMapObjectIndex]
 	ld c, a

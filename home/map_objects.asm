@@ -660,3 +660,11 @@ GetSpriteDirection::
 	ld a, [hl]
 	maskbits NUM_DIRECTIONS, 2
 	ret
+
+CheckActiveFollowerBallAnim::
+	push hl
+	push bc
+	homecall _CheckActiveFollowerBallAnim
+	pop bc
+	pop hl
+	ret
