@@ -245,6 +245,7 @@ DoFollowerInteraction:
 
 StoreFollowerNickInBuffer:
 	ld a, [wFollowerPartyNum]
+	dec a
 	ld hl, wPartyMon1Nickname
 	and a
 	jr z, .done
