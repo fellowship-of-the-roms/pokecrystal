@@ -232,20 +232,27 @@ GetMonSprite:
 	jp nz, GetMonSprite
 
 GetFirstAliveMon::
+; Returns [wParty#Sprite] in a; party number in d
 	ld a, [wPartyCount]
 	and a
 	ret z
+	inc a
+	ld d, 1
 	ld e, a
 	ld bc, wPartyMon1
 .loop
 	ld hl, MON_HP
 	add hl, bc
 	ld a, [hli]
+	push de
 	ld d, a
 	ld a, [hl]
 	or d
+	pop de
 	jr nz, .got_mon_struct
-	dec e
+	inc d
+	ld a, d
+	cp e
 	ret z
 	ld hl, PARTYMON_STRUCT_LENGTH
 	add hl, bc
@@ -263,7 +270,7 @@ GetFollowingSprite:
 	call GetFirstAliveMon
 	ld [wFollowerSpriteID], a
 	push af
-	ld a, e
+	ld a, d
 	ld [wFollowerPartyNum], a
 	pop af
 
@@ -383,11 +390,33 @@ _GetSpritePalette::
 	ret
 
 .follower
-	ld hl, FollowingPalettes
+	dec a
+	ld hl, MenuMonPals
 	ld b, 0
 	ld c, a
 	add hl, bc
-	ld a, BANK(FollowingPalettes)
+	ld a, BANK(MenuMonPals)
+	call GetFarByte
+	push de
+	ld d, a
+	ld a, [wFollowerPartyNum]
+	dec a
+	ld hl, wPartyMon1DVs
+	call GetPartyLocation
+	ld b, h
+	ld c, l
+	farcall CheckShininess
+	ld a, d
+	pop de
+	jr c, .shiny
+	swap a
+.shiny
+	and $f
+	ld hl, FollowingPalLookupTable
+	ld b, 0
+	ld c, a
+	add hl, bc
+	ld a, BANK(FollowingPalLookupTable)
 	call GetFarByte
 	ld c, a
 	ret

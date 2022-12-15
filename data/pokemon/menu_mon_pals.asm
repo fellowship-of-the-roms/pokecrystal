@@ -3,7 +3,18 @@ MACRO menu_mon_pals
 	dn PAL_MON_\1, PAL_MON_\2
 ENDM
 
-MenuMonPals:
+FollowingPalLookupTable::
+; Entries map party_menu pals to OW pals.
+	db PAL_OW_RED    ; PAL_MON_RED
+	db PAL_OW_BLUE   ; PAL_MON_BLUE
+	db PAL_OW_GREEN  ; PAL_MON_GREEN
+	db PAL_OW_BROWN  ; PAL_MON_BROWN
+	db PAL_OW_RED    ; PAL_MON_PINK
+	db PAL_OW_BROWN  ; PAL_MON_GRAY
+	db PAL_OW_BLUE   ; PAL_MON_TEAL
+	db PAL_OW_PURPLE ; PAL_MON_PURPLE
+
+MenuMonPals::
 	table_width 1, MenuMonPals
 	;             normal, shiny
 	menu_mon_pals TEAL,   GREEN  ; BULBASAUR
