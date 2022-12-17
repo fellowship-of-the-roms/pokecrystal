@@ -49,6 +49,12 @@ LoadPartyMenuMonColors:
 	call GetMenuMonPalette
 	ld hl, wShadowOAMSprite00Attributes
 	push af
+	ld a, [hl]
+	and X_FLIP
+	ld b, a
+	pop af
+	or b
+	push af
 	ld a, [wCurPartyMon]
 	swap a
 	ld d, 0
