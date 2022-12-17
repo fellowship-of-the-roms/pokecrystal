@@ -175,6 +175,8 @@ hDebugRoomMenuPage::
 endc
 hClockResetTrigger:: db
 
-	ds 19
+hDelayFrameLY:: db
+
+	ds 18
 
 ENDSECTION

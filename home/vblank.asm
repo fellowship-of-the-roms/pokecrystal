@@ -120,13 +120,6 @@ VBlank_Normal::
 	xor a
 	ld [wVBlankOccurred], a
 
-	ld a, [wOverworldDelay]
-	and a
-	jr z, .ok
-	dec a
-	ld [wOverworldDelay], a
-.ok
-
 	ld a, [wTextDelayFrames]
 	and a
 	jr z, .ok2
