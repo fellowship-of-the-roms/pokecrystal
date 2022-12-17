@@ -1346,6 +1346,7 @@ StepTypesJumptable:
 	dw StepFunction_SkyfallTop      ; 19
 	dw StepFunction_PokeballOpening ; 1b
 	dw StepFunction_PokeballClosing ; 1a
+	dw StepFunction_NPCJumpInPlace  ; 1b
 	assert_table_length NUM_STEP_TYPES
 
 WaitStep_InPlace:
@@ -1479,6 +1480,46 @@ StepFunction_PokeballClosing:
 	set FOLLOWER_IN_POKEBALL_F, [hl]
 	res FOLLOWER_ENTERING_BALL_F, [hl]
 	jp DeleteMapObject
+
+StepFunction_NPCJumpInPlace:
+	call ObjectStep_AnonJumptable
+.anon_dw
+	dw .Jump
+	dw .Land
+
+.Jump:
+	ld h, 4
+	call UpdateJumpPositionInPlace
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	ret nz
+	ld hl, OBJECT_FLAGS2
+	add hl, bc
+	res OVERHEAD_F, [hl]
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	ld [hl], 4
+	jp ObjectStep_IncAnonJumptableIndex
+
+.Land:
+	ld h, 4
+	call UpdateJumpPositionInPlace
+	ld hl, OBJECT_STEP_DURATION
+	add hl, bc
+	dec [hl]
+	ret nz
+	ld hl, OBJECT_STEP_TYPE
+	add hl, bc
+	ld [hl], STEP_TYPE_FROM_MOVEMENT
+	xor a
+	ld hl, OBJECT_SPRITE_Y_OFFSET
+	add hl, bc
+	ld [hl], a
+	ld hl, OBJECT_FLAGS2
+	add hl, bc
+	res HIGH_PRIORITY_F, [hl]
+	ret
 
 StepFunction_NPCJump:
 	call ObjectStep_AnonJumptable
@@ -2188,6 +2229,7 @@ Stubbed_UpdateYOffset:
 
 UpdateJumpPosition:
 	call GetStepVector
+UpdateJumpPositionInPlace:
 	ld a, h
 	ld hl, OBJECT_JUMP_HEIGHT
 	add hl, bc
