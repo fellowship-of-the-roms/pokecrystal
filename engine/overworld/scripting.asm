@@ -2385,5 +2385,6 @@ Script_appearfollower:
 	ld hl, wFollowerFlags
 	set FOLLOWER_INVISIBLE_F, [hl]
 	set FOLLOWER_IN_POKEBALL_F, [hl]
-	jp SpawnPokeballOpening
+;	jp SpawnPokeballOpening
+	ret
 
