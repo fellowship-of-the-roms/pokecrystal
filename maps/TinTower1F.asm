@@ -112,7 +112,13 @@ TinTower1FSuicuneBattleScript:
 .Next2:
 	turnobject PLAYER, UP
 	pause 10
-	applymovement PLAYER, TinTower1FPlayerBacksUpMovement
+	applymovement PLAYER, TinTower1FFixFacing
+	freezefollower
+	follow FOLLOWER, PLAYER
+	applymovement FOLLOWER, TinTower1FPlayerBacksUpMovement
+	stopfollow
+	unfreezefollower
+	applymovement PLAYER, TinTower1FUnfixFacing
 	applymovement TINTOWER1F_SUICUNE, TinTower1FSuicuneApproachesMovement
 	cry SUICUNE
 	pause 20
@@ -137,6 +143,7 @@ TinTower1FSuicuneBattleScript:
 	playsound SFX_ENTER_DOOR
 	moveobject TINTOWER1F_EUSINE, 10, 15
 	appear TINTOWER1F_EUSINE
+	applymovement FOLLOWER, TinTower1FFollowerMoves
 	applymovement TINTOWER1F_EUSINE, TinTower1FEusineEntersMovement
 	playsound SFX_ENTER_DOOR
 	moveobject TINTOWER1F_SAGE1, 9, 15
@@ -269,8 +276,21 @@ TinTower1FSuicuneApproachesMovement:
 	step_end
 
 TinTower1FPlayerBacksUpMovement:
+	step RIGHT
+	turn_head UP
+	step_end
+
+TinTower1FFollowerMoves:
+	step UP
+	step LEFT
+	turn_head DOWN
+	step_end
+
+TinTower1FFixFacing:
 	fix_facing
-	big_step DOWN
+	step_end
+
+TinTower1FUnfixFacing:
 	remove_fixed_facing
 	step_end
 

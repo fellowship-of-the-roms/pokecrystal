@@ -31,9 +31,13 @@ Route34IlexForestGateCelebiEvent:
 	turnobject PLAYER, RIGHT
 	applymovement FOLLOWER, Route34IlexForestGateTeacherBlocksPlayerMovement
 	freezefollower
+	applymovement FOLLOWER, Route34IlexForestGateTeacherBlocksPlayerMovement
+	freezefollower
 	follow PLAYER, ROUTE34ILEXFORESTGATE_TEACHER2
 	applymovement PLAYER, Route34IlexForestGateTeacherBlocksPlayerMovement
 	stopfollow
+	turnobject ROUTE34ILEXFORESTGATE_TEACHER2, UP
+	unfreezefollower
 	turnobject ROUTE34ILEXFORESTGATE_TEACHER2, UP
 	unfreezefollower
 	turnobject PLAYER, DOWN

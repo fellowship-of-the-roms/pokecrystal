@@ -86,9 +86,11 @@ EcruteakGymClosed:
 	writetext EcruteakGymClosedText
 	waitbutton
 	closetext
+	freezefollower
 	follow PLAYER, ECRUTEAKGYM_GRAMPS
 	applymovement PLAYER, EcruteakGymPlayerSlowStepDownMovement
 	stopfollow
+	unfreezefollower
 	special FadeOutToWhite
 	playsound SFX_ENTER_DOOR
 	waitsfx
