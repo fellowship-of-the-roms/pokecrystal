@@ -153,8 +153,9 @@ MrPokemonsHouse_StrangeCoins:
 	jumptext MrPokemonsHouse_StrangeCoinsText
 
 MrPokemonsHouse_PlayerWalksToMrPokemon:
-	step RIGHT
 	step UP
+	step RIGHT
+	turn_head UP
 	step_end
 
 MrPokemonsHouse_OakWalksToPlayer:

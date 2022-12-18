@@ -31,6 +31,8 @@ NewBarkTown_TeacherStopsYouScene1:
 	closetext
 	turnobject PLAYER, RIGHT
 	applymovement NEWBARKTOWN_TEACHER, NewBarkTown_TeacherRunsToYouMovement1
+	applymovement FOLLOWER, NewBarkTown_FollowerMovesOutOfTheWay
+	applymovement NEWBARKTOWN_TEACHER, NewBarkTown_TeacherRunsToYouMovement1_2
 	opentext
 	writetext Text_WhatDoYouThinkYoureDoing
 	waitbutton
@@ -147,10 +149,19 @@ NewBarkTownElmsLabSign:
 NewBarkTownElmsHouseSign:
 	jumptext NewBarkTownElmsHouseSignText
 
+NewBarkTown_FollowerMovesOutOfTheWay:
+	step DOWN
+	step LEFT
+	turn_head UP
+	step_end
+
 NewBarkTown_TeacherRunsToYouMovement1:
 	step LEFT
 	step LEFT
 	step LEFT
+	step_end
+
+NewBarkTown_TeacherRunsToYouMovement1_2:
 	step LEFT
 	step_end
 
