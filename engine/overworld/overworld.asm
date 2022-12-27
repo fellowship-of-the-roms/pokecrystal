@@ -457,6 +457,7 @@ endr
 	call Get2bpp
 	pop af
 	ldh [rVBK], a
+	farcall CopySpritePal
 	ret
 
 LoadEmote::

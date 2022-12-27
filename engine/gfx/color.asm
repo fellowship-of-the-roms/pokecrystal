@@ -1255,15 +1255,15 @@ LoadMapPals:
 	ldh [rWBK], a
 
 .got_pals
-	ld a, [wTimeOfDayPal]
-	maskbits NUM_DAYTIMES
-	ld bc, 8 palettes
-	ld hl, MapObjectPals
-	call AddNTimes
-	ld de, wOBPals1
-	ld bc, 8 palettes
-	ld a, BANK(wOBPals1)
-	call FarCopyWRAM
+;	ld a, [wTimeOfDayPal]
+;	maskbits NUM_DAYTIMES
+;	ld bc, 8 palettes
+;	ld hl, MapObjectPals
+;	call AddNTimes
+;	ld de, wOBPals1
+;	ld bc, 8 palettes
+;	ld a, BANK(wOBPals1)
+;	call FarCopyWRAM
 
 	ld a, [wEnvironment]
 	cp TOWN
@@ -1291,6 +1291,38 @@ endr
 	ld bc, 4
 	ld a, BANK(wBGPals1)
 	call FarCopyWRAM
+	ret
+
+CopySpritePal::
+	push af
+	push bc
+	push de
+	push hl
+	ld a, [wTimeOfDayPal]
+	maskbits NUM_DAYTIMES
+	ld bc, 8 palettes
+	ld hl, MapObjectPals
+	call AddNTimes
+	ld a, [hUsedSpriteIndex]
+;	cp SPRITE_MOM
+;	jr nz, .done
+	ld c, a
+	push hl
+	farcall _GetSpritePalette
+	pop hl
+	ld bc, 1 palettes
+	call AddNTimes
+	ld de, wOBPals2
+	ld bc, 1 palettes
+	ld a, BANK(wOBPals2)
+	call FarCopyWRAM
+	ld a, TRUE
+	ldh [hCGBPalUpdate], a
+.done
+	pop af
+	pop bc
+	pop de
+	pop hl
 	ret
 
 INCLUDE "data/maps/environment_colors.asm"
