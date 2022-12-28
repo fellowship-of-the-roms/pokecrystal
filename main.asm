@@ -683,6 +683,11 @@ INCLUDE "engine/events/battle_tower/load_trainer.asm"
 INCLUDE "engine/events/odd_egg.asm"
 
 
+SECTION "Dynamic Pals", ROMX
+
+INCLUDE "engine/overworld/dynamic_pals.asm"
+
+
 SECTION "Stadium 2 Checksums", ROMX[$7DE0], BANK[$7F]
 
 ; The end of the ROM is taken up by checksums of the content, apparently used
