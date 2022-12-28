@@ -2937,8 +2937,8 @@ wUsedObjectPals:: db
 for n, 8
 wLoadedObjPal{d:n}:: db 
 endr
-
-	ds 31
+wNeededPalIndex:: db
+	ds 30
 
 wMapObjects::
 wPlayerObject:: map_object wPlayer ; player is map object 0
