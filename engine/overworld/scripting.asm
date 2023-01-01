@@ -240,6 +240,9 @@ ScriptCommandTable:
 	dw Script_followcry                  ; ad
 	dw Script_stowfollower               ; ae
 	dw Script_appearfollower             ; af
+	dw Script_appearfolloweronestep      ; b0
+	dw Script_savefollowercoords         ; b1
+	dw Script_silentstowfollower         ; b2
 	assert_table_length NUM_EVENT_COMMANDS
 
 StartScript:
@@ -970,7 +973,9 @@ Script_variablesprite:
 
 Script_appear:
 	call GetScriptByte
-.skip_input:
+	ld b, a
+Script_appear_skipinput::
+	ld a, b
 	call GetScriptObject
 	call UnmaskCopyMapObjectStruct
 	ldh a, [hMapObjectIndex]
@@ -1377,8 +1382,7 @@ StdScript:
 	ld b, a
 	inc hl
 	ld a, BANK(StdScripts)
-	call GetFarWord
-	ret
+	jp GetFarWord
 
 SkipTwoScriptBytes:
 	call GetScriptByte
@@ -1686,8 +1690,7 @@ ResetStringBuffer1:
 	ld hl, wStringBuffer1
 	ld bc, NAME_LENGTH
 	ld a, '@'
-	call ByteFill
-	ret
+	jp ByteFill
 
 Script_getstring:
 	call GetScriptByte
@@ -1984,8 +1987,7 @@ Script_clearevent:
 	call GetScriptByte
 	ld d, a
 	ld b, RESET_FLAG
-	call EventFlagAction
-	ret
+	jp EventFlagAction
 
 Script_checkevent:
 	call GetScriptByte
@@ -2008,8 +2010,7 @@ Script_setflag:
 	call GetScriptByte
 	ld d, a
 	ld b, SET_FLAG
-	call _EngineFlagAction
-	ret
+	jp _EngineFlagAction
 
 Script_clearflag:
 	call GetScriptByte
@@ -2084,8 +2085,7 @@ Script_warp:
 	ldh [hMapEntryMethod], a
 	ld a, MAPSTATUS_ENTER
 	call LoadMapStatus
-	call StopScript
-	ret
+	jp StopScript
 
 .not_ok
 	call GetScriptByte
@@ -2233,10 +2233,11 @@ Script_deactivatefacing:
 	jr z, .no_time
 	ld [wScriptDelay], a
 .no_time
+; fallthrough
+DoScriptWait:
 	ld a, SCRIPT_WAIT
 	ld [wScriptMode], a
-	call StopScript
-	ret
+	jp StopScript
 
 Script_stopandsjump:
 	call StopScript
@@ -2342,25 +2343,11 @@ Script_checksave:
 	ret
 
 Script_freezefollower:
-	ld bc, wObject1Struct
-	call DoesObjectHaveASprite
-	ret z
-	ld hl, OBJECT_FLAGS2
-	add hl, bc
-	set FROZEN_F, [hl]
-	ld hl, wFollowerFlags
-	set FOLLOWER_FROZEN_F, [hl]
+	farcall _FreezeFollower
 	ret
 
 Script_unfreezefollower:
-	ld bc, wObject1Struct
-	call DoesObjectHaveASprite
-	ret z
-	ld hl, OBJECT_FLAGS2
-	add hl, bc
-	res FROZEN_F, [hl]
-	ld hl, wFollowerFlags
-	res FOLLOWER_FROZEN_F, [hl]
+	farcall _UnfreezeFollower
 	ret
 
 Script_getfollowerdirection:
@@ -2373,18 +2360,22 @@ Script_followcry:
 
 Script_stowfollower:
 	farcall _StowFollower
-	ret
+	jp DoScriptWait
 
 Script_appearfollower:
-	ld a, FOLLOWER
-	call Script_appear.skip_input
-	ld bc, wObject1Struct
-	ld hl, OBJECT_FLAGS1
-	add hl, bc
-	set INVISIBLE_F, [hl]
-	ld hl, wFollowerFlags
-	set FOLLOWER_INVISIBLE_F, [hl]
-	set FOLLOWER_IN_POKEBALL_F, [hl]
-;	jp SpawnPokeballOpening
+	farcall _AppearFollower
+	jp DoScriptWait
+
+Script_appearfolloweronestep:
+	farcall _AppearFollowerOneStep
+	jp DoScriptWait
+
+Script_savefollowercoords:
+	farcall _SaveFollowerCoords
 	ret
 
+Script_silentstowfollower:
+	xor a
+	ld [wScriptDelay], a
+	farcall _SilentStowFollower
+	ret
