@@ -76,7 +76,7 @@ MenuMonPals::
 	menu_mon_pals BROWN,  BROWN  ; PRIMEAPE
 	menu_mon_pals RED,    BROWN  ; GROWLITHE
 	menu_mon_pals RED,    BROWN  ; ARCANINE
-	menu_mon_pals RED,    RED    ; POLIWAG
+	menu_mon_pals BLUE,   TEAL   ; POLIWAG
 	menu_mon_pals BLUE,   BLUE   ; POLIWHIRL
 	menu_mon_pals BLUE,   TEAL   ; POLIWRATH
 	menu_mon_pals BROWN,  PURPLE ; ABRA
