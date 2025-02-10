@@ -32,32 +32,32 @@ EnableEvents::
 
 CheckEnabledMapEventsBit5:
 	ld hl, wEnabledPlayerEvents
-	bit 5, [hl]
+	bit PLAYEREVENTS_UNUSED, [hl]
 	ret
 
 EnableWildEncounters:
 	ld hl, wEnabledPlayerEvents
-	set 4, [hl]
+	set PLAYEREVENTS_WILD_ENCOUNTERS, [hl]
 	ret
 
 CheckWarpConnectionsEnabled:
 	ld hl, wEnabledPlayerEvents
-	bit 2, [hl]
+	bit PLAYEREVENTS_WARPS_AND_CONNECTIONS, [hl]
 	ret
 
 CheckCoordEventsEnabled:
 	ld hl, wEnabledPlayerEvents
-	bit 1, [hl]
+	bit PLAYEREVENTS_COORD_EVENTS, [hl]
 	ret
 
 CheckStepCountEnabled:
 	ld hl, wEnabledPlayerEvents
-	bit 0, [hl]
+	bit PLAYEREVENTS_COUNT_STEPS, [hl]
 	ret
 
 CheckWildEncountersEnabled:
 	ld hl, wEnabledPlayerEvents
-	bit 4, [hl]
+	bit PLAYEREVENTS_WILD_ENCOUNTERS, [hl]
 	ret
 
 StartMap:
@@ -415,13 +415,13 @@ endr
 	call CallScript
 
 	ld hl, wScriptFlags
-	res 3, [hl]
+	res RUN_DEFERRED_SCRIPT, [hl]
 
 	farcall EnableScriptMode
 	farcall ScriptEvents
 
 	ld hl, wScriptFlags
-	bit 3, [hl]
+	bit RUN_DEFERRED_SCRIPT, [hl]
 	jr z, .nope
 
 	ld hl, wDeferredScriptAddr
@@ -556,7 +556,7 @@ TryObjectEvent:
 	ret
 
 ObjectEventTypeArray:
-	table_width 3, ObjectEventTypeArray
+	table_width 3
 	dbw OBJECTTYPE_SCRIPT, .script
 	dbw OBJECTTYPE_ITEMBALL, .itemball
 	dbw OBJECTTYPE_TRAINER, .trainer
@@ -627,7 +627,7 @@ TryBGEvent:
 	ret
 
 BGEventJumptable:
-	table_width 2, BGEventJumptable
+	table_width 2
 	dw .read
 	dw .up
 	dw .down
@@ -746,7 +746,7 @@ PlayerMovement:
 
 PlayerMovementPointers:
 ; entries correspond to PLAYERMOVEMENT_* constants
-	table_width 2, PlayerMovementPointers
+	table_width 2
 	dw .normal
 	dw .warp
 	dw .turn
@@ -962,7 +962,7 @@ DoPlayerEvent:
 
 PlayerEventScriptPointers:
 ; entries correspond to PLAYEREVENT_* constants
-	table_width 3, PlayerEventScriptPointers
+	table_width 3
 	dba InvalidEventScript      ; PLAYEREVENT_NONE
 	dba SeenByTrainerScript     ; PLAYEREVENT_SEENBYTRAINER
 	dba TalkToTrainerScript     ; PLAYEREVENT_TALKTOTRAINER

@@ -508,7 +508,7 @@ SetDayOfWeek:
 	ret
 
 .WeekdayStrings:
-; entries correspond to wCurDay constants (see constants/wram_constants.asm)
+; entries correspond to wCurDay constants (see constants/ram_constants.asm)
 	dw .Sunday
 	dw .Monday
 	dw .Tuesday
@@ -543,7 +543,7 @@ SetDayOfWeek:
 
 InitialSetDSTFlag:
 	ld a, [wDST]
-	set 7, a
+	set DST_F, a
 	ld [wDST], a
 	hlcoord 1, 14
 	lb bc, 3, 18
@@ -570,7 +570,7 @@ InitialSetDSTFlag:
 
 InitialClearDSTFlag:
 	ld a, [wDST]
-	res 7, a
+	res DST_F, a
 	ld [wDST], a
 	hlcoord 1, 14
 	lb bc, 3, 18
@@ -633,7 +633,7 @@ MrChrono: ; unreferenced
 	inc hl
 
 	ld a, [wDST]
-	bit 7, a
+	bit DST_F, a
 	jr z, .off
 
 	ld [hl], "O"
