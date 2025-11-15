@@ -341,7 +341,7 @@ Get2bpp::
 	jp nz, Request2bpp
 	; fallthrough
 
-Copy2bpp:
+Copy2bpp::
 	push hl
 	ld h, d
 	ld l, e

@@ -630,6 +630,24 @@ wMobileTransferData:: ds 480
 
 SECTION UNION "Miscellaneous", WRAM0
 
+; voltorb flip
+wVoltorbFlipCardProperties:: ds 25
+wVoltorbFlipState:: db
+wVoltorbFlipLevel:: db
+wVoltorbFlipCursorX:: db
+wVoltorbFlipCursorY:: db
+wVoltorbFlipLastX:: db
+wVoltorbFlipLastY:: db
+wVoltorbFlipCardsFlipped:: db
+wVoltorbFlipUnflippedMultipliers:: db
+wVoltorbFlipNumberTotals:: ds 10
+wVoltorbFlipVoltorbTotals:: ds 10
+wVoltorbFlipCoinsThisGame:: dw
+wVoltorbFlipDataEnd::
+
+
+SECTION UNION "Miscellaneous", WRAM0
+
 ; This union spans 200 bytes.
 UNION
 ; timeset temp storage

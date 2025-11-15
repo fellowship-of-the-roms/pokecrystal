@@ -183,3 +183,6 @@ SpecialsPointers::
 	add_special InitialSetDSTFlag
 	add_special InitialClearDSTFlag
 	add_special UnusedDummySpecial ; unused
+
+; New specials
+	add_special VoltorbFlip

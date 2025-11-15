@@ -313,6 +313,29 @@ GoldenrodGameCornerLuckySlotsMachineScript:
 	closetext
 	end
 
+GoldenrodGameCornerVoltorbFlipMachineScript:
+	opentext
+	checkitem COIN_CASE
+	iftrue .GoldenrodGameCornerWanttoPlayVoltorbFlip
+	writetext GoldenrodGameCornerNoCoinCaseText
+	waitbutton
+	closetext
+	end
+
+.GoldenrodGameCornerWanttoPlayVoltorbFlip
+	special DisplayCoinCaseBalance
+	writetext GoldenrodGameCornerPlayVoltorbFlipText
+	yesorno
+	iftrue .PlayVoltorbFlip
+	closetext
+	end
+
+.PlayVoltorbFlip
+	refreshscreen
+	special VoltorbFlip
+	closetext
+	end
+
 GoldenrodGameCornerCardFlipMachineScript:
 	reanchormap
 	special CardFlip
@@ -363,6 +386,15 @@ GoldenrodGameCornerPrizeVendorNoCoinCaseText:
 	line "a COIN CASE."
 	done
 
+GoldenrodGameCornerNoCoinCaseText:
+	text "You don't have a"
+	line "COIN CASE."
+	done
+
+GoldenrodGameCornerPlayVoltorbFlipText:
+	text "Play VOLTORB FLIP?"
+	done
+
 GoldenrodGameCornerPharmacistText:
 if DEF(_CRYSTAL_AU)
 	text "This machine looks"
@@ -379,34 +411,19 @@ else
 endc
 
 GoldenrodGameCornerPokefanM1Text:
-if DEF(_CRYSTAL_AU)
-	text "These machines"
-	line "seem different"
+	text "Voltorb Flip is"
+	line "the newest game."
 
-	para "from the ones at"
-	line "CELADON CITY!"
+	para "It's a bit more"
+	line "strategic than the"
+	cont "others."
 	done
-else
-	text "I just love this"
-	line "new slot machine."
-
-	para "It's more of a"
-	line "challenge than the"
-	cont "ones in CELADON."
-	done
-endc
 
 GoldenrodGameCornerCooltrainerMText:
-if DEF(_CRYSTAL_AU)
-	text "Nothing is certain"
-	line "in this area."
-	done
-else
 	text "Life is a gamble."
 	line "I'm going to flip"
 	cont "cards till I drop!"
 	done
-endc
 
 GoldenrodGameCornerPokefanFText:
 	text "Card flip…"
@@ -498,18 +515,18 @@ GoldenrodGameCorner_MapEvents:
 	bg_event  7,  9, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
 	bg_event  7, 10, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
 	bg_event  7, 11, BGEVENT_LEFT, GoldenrodGameCornerSlotsMachineScript
-	bg_event 12,  6, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
-	bg_event 12,  7, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
-	bg_event 12,  8, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
-	bg_event 12,  9, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
-	bg_event 12, 10, BGEVENT_READ, GoldenrodGameCornerSlotsMachineScript
-	bg_event 12, 11, BGEVENT_RIGHT, GoldenrodGameCornerSlotsMachineScript
-	bg_event 13,  6, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
-	bg_event 13,  7, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
-	bg_event 13,  8, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
-	bg_event 13,  9, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
-	bg_event 13, 10, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
-	bg_event 13, 11, BGEVENT_LEFT, GoldenrodGameCornerCardFlipMachineScript
+	bg_event 12,  6, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 12,  7, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 12,  8, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 12,  9, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 12, 10, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 12, 11, BGEVENT_RIGHT, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 13,  6, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 13,  7, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 13,  8, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 13,  9, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 13, 10, BGEVENT_READ, GoldenrodGameCornerVoltorbFlipMachineScript
+	bg_event 13, 11, BGEVENT_LEFT, GoldenrodGameCornerVoltorbFlipMachineScript
 	bg_event 18,  6, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
 	bg_event 18,  7, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript
 	bg_event 18,  8, BGEVENT_READ, GoldenrodGameCornerCardFlipMachineScript

@@ -198,6 +198,13 @@ SlotMachine:
 	call StartGameCornerGame
 	ret
 
+VoltorbFlip:
+	call CheckCoinsAndCoinCase
+	ret c
+	ld a, BANK(_VoltorbFlip)
+	ld hl, _VoltorbFlip
+	jr StartGameCornerGame
+
 CardFlip:
 	call CheckCoinsAndCoinCase
 	ret c
