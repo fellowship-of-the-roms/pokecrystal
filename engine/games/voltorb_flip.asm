@@ -25,7 +25,6 @@ DEF VOLTORB_FLIP_NUMBER2_TILE_BASE  EQU $66
 DEF VOLTORB_FLIP_COUNTER_BORDER_TILE EQU $17
 DEF VOLTORB_FLIP_NUMBER1_TILE_BASE EQU $f6
 DEF VOLTORB_FLIP_RANDOM_MASK    EQU $f
-DEF VOLTORB_FLIP_TILEMAP_CARD_STRIDE EQU $0938
 DEF VOLTORB_FLIP_TILEMAP_ROW_BACK_OFFSET EQU $ffd9
 DEF VOLTORB_FLIP_HIGHLIGHT_ATTR_OFFSET EQU $90f
 DEF VOLTORB_FLIP_HIGHLIGHT_ROW_OFFSET EQU $11
@@ -893,7 +892,7 @@ VFRefreshMap:
 .g2x1
 	push bc
 	push hl
-	ld bc, VOLTORB_FLIP_TILEMAP_CARD_STRIDE
+	ld bc, wAttrmap - wTilemap - 1
 	add hl,bc
 	xor a
 	ld [hli], a
@@ -1031,7 +1030,7 @@ VFRefreshMap:
 	ld [hli], a
 	push bc
 	push hl
-	ld bc, VOLTORB_FLIP_TILEMAP_CARD_STRIDE
+	ld bc, wAttrmap - wTilemap - 1
 	add hl,bc
 	ld [hli], a
 	ld [hli], a
@@ -1098,7 +1097,7 @@ VFRefreshMap:
 	dec a
 	push bc
 	push hl
-	ld bc, VOLTORB_FLIP_TILEMAP_CARD_STRIDE
+	ld bc, wAttrmap - wTilemap - 1
 	add hl,bc
 	ld [hli], a
 	ld [hli], a
@@ -1391,7 +1390,7 @@ VFFlipAnimation:
 	push bc
 	push af
 	push hl
-	ld bc, VOLTORB_FLIP_TILEMAP_CARD_STRIDE
+	ld bc, wAttrmap - wTilemap - 1
 	add hl,bc
 	ld a, 1
 	ld [hli], a
