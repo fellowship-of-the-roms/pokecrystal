@@ -253,11 +253,21 @@ CheckFacingObject::
 	ldh [hMapObjectIndex], a
 	call IsNPCAtCoord
 	ret nc
+; A hidden follower -- recalled into its ball on water, or hidden for a warp -- is still on the
+; map, so IsNPCAtCoord finds it, but there is nothing there to face: no talking to it.
+	ldh a, [hObjectStructIndex]
+	cp FOLLOWER ; object struct 1 is the follower's
+	jr nz, .not_hidden_follower
+	ld a, [wFollowerFlags]
+	and FOLLOWER_INVISIBLE | 1 << FOLLOWER_IN_POKEBALL_F
+	jr nz, .no
+.not_hidden_follower
 	ld hl, OBJECT_WALKING
 	add hl, bc
 	ld a, [hl]
 	cp STANDING
 	jr z, .standing
+.no
 	xor a
 	ret
 
