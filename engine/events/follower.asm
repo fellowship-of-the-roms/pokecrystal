@@ -187,6 +187,7 @@ DoFollowerInteraction:
 	push bc
 	ld c, a
 	ld a, [wFollowerPartyNum]
+	dec a ; wFollowerPartyNum is 1-based
 	ld [wCurPartyMon], a
 	ld a, MON_STATUS
 	push hl
