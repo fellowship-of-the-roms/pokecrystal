@@ -404,6 +404,38 @@ UpdateFollowerSprite:
 	call SpawnPokeballClosing
 	ret
 
+TryRestoreHiddenFollower:
+; in: bc = the follower's object struct
+	ld hl, wFollowerFlags
+	bit FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
+	ret z
+	bit FOLLOWER_IN_POKEBALL_F, [hl]
+	ret nz ; the poke ball animation owns visibility while it plays
+
+	ld hl, OBJECT_MAP_X
+	add hl, bc
+	ld d, [hl]
+	ld hl, OBJECT_MAP_Y
+	add hl, bc
+	ld e, [hl]
+
+	ldh a, [hObjectStructIndex]
+	push af
+	push bc
+	call IsNPCAtCoord ; carry if another object is on d,e
+	pop bc
+	pop af
+	ldh [hObjectStructIndex], a
+	ret c
+
+	ld hl, wFollowerFlags
+	res FOLLOWER_INVISIBLE_ONE_STEP_F, [hl]
+	res FOLLOWER_INVISIBLE_F, [hl]
+	ld hl, OBJECT_FLAGS1
+	add hl, bc
+	res INVISIBLE_F, [hl]
+	ret
+
 CheckFollowerInvisOneStep:
 	; Although the below could be optimized, it is currently easier to understand.
 	cp PLAYER
@@ -819,6 +851,7 @@ MovementFunction_Strength:
 	ret
 
 MovementFunction_FollowerObj:
+	call TryRestoreHiddenFollower
 	ld a, [wFollowerFlags]
 	bit FOLLOWER_FROZEN_F, a
 	jr z, .follow_not_exact

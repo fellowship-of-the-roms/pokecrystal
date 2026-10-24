@@ -990,9 +990,9 @@ WarpToNewMapScript:
 
 FallIntoMapScript:
 	newloadmap MAPSETUP_FALL
+	callasm FollowerInBall
 	playsound SFX_KINESIS
 	applymovement PLAYER, .SkyfallMovement
-	callasm FollowerInBall
 	playsound SFX_STRENGTH
 	scall LandAfterPitfallScript
 	end
@@ -1040,6 +1040,7 @@ FollowerInBall:
 	ld hl, wFollowerFlags
 	set FOLLOWER_INVISIBLE_F, [hl]
 	set FOLLOWER_IN_POKEBALL_F, [hl]
+	set FOLLOWER_INVISIBLE_ONE_STEP_F, [hl] ; so the player's next step brings it back out
 	pop bc
 	ret
 
